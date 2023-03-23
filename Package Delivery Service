@@ -1,0 +1,142 @@
+# Neyan Manuel Montes Abad
+# T00064020
+# This code is made in the Python programming language.
+
+# We create the PACKAGE class that will be the fundamental piece of all the code
+
+class Package:
+    # We define the constructor with the characteristics of the objects
+
+    def __init__(self, code, weight, cost_per_kilogram, description):
+        # In this case, we will use the characteristics of code, weight, cost per kilogram and description
+
+        self.code = code
+        self.weight = weight
+        self.cost_per_kilogram = cost_per_kilogram
+        self.description = description
+    
+    # We define the method CALCULATE
+
+    def calculate(self):
+        # We return the product of the calculation that is weight by the cost per kilograms
+
+        return self.weight * self.cost_per_kilogram
+
+# We create the first subclass that will handle when the package is standard
+
+class StandardPackage(Package):
+    # We declare the attributes that it inherits from the PACKAGE class
+
+    def __init__(self, code, weight, cost_per_kilogram, description, two_day_fee):
+        # We use the "super()" function to indicate the attributes that the child class 
+        # inherits from the superior
+
+        super().__init__(code, weight, cost_per_kilogram, description)
+        self.two_day_fee = two_day_fee # We add a constant shipping cost that corresponds to 2 days
+
+    def calculate(self):
+        # We return the value of the shipping calculation (from the main class) plus the new constant 
+        # value that we declared
+
+        return super().calculate() + self.two_day_fee
+
+# We create the second subclass that will handle when the package is overweght
+
+class OverweightPackage(Package):
+    # We do the same as in the previous subclass
+
+    def __init__(self, code, weight, cost_per_kilogram, description, overweight_cost_per_kilogram):
+        # Use the "super()" function again.
+
+        super().__init__(code, weight, cost_per_kilogram, description)
+        # This time we declare a constant that will be in charge of adding the extra cost due to overweight
+
+        self.overweight_cost_per_kilogram = overweight_cost_per_kilogram 
+        
+    def calculate(self):
+        # We calculate the value of kg that is declared overweight and multiply it by the value of 
+        # overweight per kilogram, in addition to returning the cost calculation by adding the overweight
+
+        overweight_cost = (self.weight - 6) * self.overweight_cost_per_kilogram
+        return super().calculate() + overweight_cost
+
+# We declare the weight limit in kg for a package with standard shipping
+
+STANDARD_PACKAGE_WEIGHT_LIMIT = 6
+
+# We import the "random" library that will be used to generate the package codes
+
+import random
+
+# We define the function that will be in charge of generating random letters, these will be generated 
+# mainly in the Unicode code (using the ord() function) and then they will be passed to the corresponding
+# character (using the chr() function)
+
+def randletter(x, y):
+    return chr(random.randint(ord(x), ord(y)))
+
+# We use the previously defined function to generate 2 characters
+
+letter_a = randletter('A', 'Z')
+letter_b = randletter('A', 'Z')
+
+# Additionally we generate a random number with 10 digits
+
+number = random.randint(1000000000, 9999999999)
+
+# We save the randomly generated values in the code variable using the .format() function 
+# with the order letter-letter-number
+
+code = '{}{}{}'.format(letter_a, letter_b, number)
+
+# We created a main menu to provide information about the program to the user
+
+print("------------------- Shipping Calculation -------------------")
+print("\nThis program will calculate the value of the shipment taking into account its weight.")
+print("\nThere are 2 calculations for this, if the shipment is a package less than or equal to 6 kg, then it will be calculated as a standard shipment, while if it exceeds the same value, the extra weight will be calculated and this will have an additional cost. worth.")
+print("\nStandard shipping: It will be calculated by multiplying the kg by a pre-established value and adding the value of the 2 shipping days.")
+print("\nOverweight shipment: The overweight will be calculated and multiplied by a preset value, which will be added to the 6kg previously calculated with the standard shipping type.\n")
+print("\nWe will proceed to the collection of data for the calculation.\n")
+
+# We ask the user to enter the value of the weight in kg of the package, in addition to 
+# entering its description
+
+weight = float(input("\nEnter the weight of the package in kg: "))
+description = input("Enter the package content: ")
+
+# We condition the value of the package based on its weight
+
+if weight > STANDARD_PACKAGE_WEIGHT_LIMIT:
+    # We activate the overweight subclass if the value is greater than the limit for a standard shipment
+    # The cost values ​​were based on those of Servientrega
+
+    cost_per_kilogram = 2084 # The cost per kilogram will be 2084
+    overweight_cost_per_kilogram = 5000 # The cost of the kg in overweight will be 5000
+    package = OverweightPackage(code=code, weight=weight, cost_per_kilogram=cost_per_kilogram, description=description, overweight_cost_per_kilogram=overweight_cost_per_kilogram)
+
+    type = "Overweight Package" # We declare the type of package to send
+
+else:
+    # We activate the subclass of the standard package if the above is not true
+    # The cost values ​​were based on those of Servientrega
+
+    cost_per_kilogram = 2084 # The cost per kilogram will be 2084
+    two_day_fee = 3000 # the value of the 2 days of shipping will be established at 3000
+    package = StandardPackage(code=code, weight=weight, cost_per_kilogram=cost_per_kilogram, description=description, two_day_fee=two_day_fee)
+    
+    type = "Standard Package" # We declare the type of package to send
+
+# We calculate the shipping cost
+
+cost1 = package.calculate()
+
+# We print a menu with the information that was provided and the one that was calculated
+
+print("\n---------------------- Information ----------------------")
+
+print("\nThe package code is: {}".format(code))
+print("The weight of the package is:", weight, "kg")
+print("The shipping type is: {}".format(type))
+print("The cost of sending the package is: ${}".format(cost1))
+print("\nThe package description is:")
+print(description)
